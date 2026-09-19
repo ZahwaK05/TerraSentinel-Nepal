@@ -1,0 +1,15 @@
+﻿# Normalise line endings to LF in the repository; checkout as-is on all platforms
+* text=auto eol=lf
+
+# Binary files — never convert
+*.tif  binary
+*.tiff binary
+*.nc   binary
+*.h5   binary
+*.hdf5 binary
+*.pkl  binary
+*.pt   binary
+*.onnx binary
+*.mp3  binary
+*.png  binary
+*.jpg  binary
