@@ -1,0 +1,10 @@
+﻿# TerraSentinel-Nepal — Geospatial requirements
+rasterio==1.3.*
+geopandas==0.14.*
+shapely==2.0.*
+pyproj==3.6.*
+fiona==1.9.*
+numpy==1.26.*
+scipy==1.13.*
+richdem==2.3.*
+python-dotenv==1.0.*

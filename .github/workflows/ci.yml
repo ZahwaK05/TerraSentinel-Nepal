@@ -1,0 +1,112 @@
+﻿name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # ── Python Lint & Test ──────────────────────────────────────────────────────
+  python-checks:
+    name: Python lint & test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install Python dependencies
+        run: |
+          pip install --upgrade pip
+          pip install ruff black pytest pytest-cov
+          pip install -r services/requirements.txt
+          pip install -r ml/requirements.txt
+          pip install -r geospatial/requirements.txt
+
+      - name: Lint with ruff
+        run: ruff check services/ ml/ geospatial/ tests/
+
+      - name: Check formatting with black
+        run: black --check services/ ml/ geospatial/ tests/
+
+      - name: Run tests
+        run: pytest tests/ -v --cov=services --cov=ml --cov=geospatial --cov-report=xml
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage.xml
+        continue-on-error: true
+
+  # ── Frontend Lint & Build ───────────────────────────────────────────────────
+  frontend-checks:
+    name: Frontend lint & build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npm run type-check
+        continue-on-error: true
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_DATA_MODE: demo
+          NEXT_PUBLIC_MAPBOX_TOKEN: ${{ secrets.MAPBOX_TOKEN_CI }}
+          NEXT_PUBLIC_API_BASE_URL: http://localhost:8000
+
+  # ── Secret Scanning Guard ───────────────────────────────────────────────────
+  secret-scan:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ── Dependency Audit ────────────────────────────────────────────────────────
+  dependency-audit:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Python pip-audit
+        run: |
+          pip install pip-audit
+          pip-audit -r services/requirements.txt || true
+          pip-audit -r ml/requirements.txt || true
+
+      - name: Node npm audit
+        working-directory: frontend
+        run: npm audit --audit-level=high || true
