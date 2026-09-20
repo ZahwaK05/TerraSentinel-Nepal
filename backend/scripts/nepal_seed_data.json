@@ -1,0 +1,202 @@
+{
+  "infrastructure": [
+    {
+      "infra_id": "hydro-melamchi-headworks",
+      "name": "Melamchi Water Supply Project - Intake Headworks",
+      "type": "Hydropower / Water Intake",
+      "zone_id": "melamchi-basin",
+      "zone_name": "Melamchi River Basin",
+      "status": "EMERGENCY_LOCKDOWN",
+      "risk_score": 82,
+      "criticality": "CRITICAL",
+      "coordinates": {
+        "lat": 27.9622,
+        "lon": 85.5681
+      },
+      "elevation_m": 1420,
+      "capacity_specs": "170 MLD Water Diversion to Kathmandu Valley",
+      "estimated_replacement_cost_usd": "35,000,000",
+      "recommended_action": "Close headworks hydraulic gates & evacuate operational staff to higher ridge."
+    },
+    {
+      "infra_id": "bridge-melamchi-pul",
+      "name": "Melamchi Motor Bridge",
+      "type": "Bridge / Highway",
+      "zone_id": "melamchi-basin",
+      "zone_name": "Melamchi River Basin",
+      "status": "EMERGENCY_LOCKDOWN",
+      "risk_score": 82,
+      "criticality": "CRITICAL",
+      "coordinates": {
+        "lat": 27.8285,
+        "lon": 85.578
+      },
+      "elevation_m": 840,
+      "capacity_specs": "Single-span prestressed concrete bridge",
+      "recommended_action": "Halt vehicular traffic and close pedestrian barriers immediately."
+    },
+    {
+      "infra_id": "bridge-helambu-suspension",
+      "name": "Helambu Pedestrian Suspension Bridge",
+      "type": "Suspension Bridge",
+      "zone_id": "melamchi-basin",
+      "zone_name": "Melamchi River Basin",
+      "status": "WARNING_ALERT",
+      "risk_score": 75,
+      "criticality": "HIGH",
+      "coordinates": {
+        "lat": 27.981,
+        "lon": 85.542
+      },
+      "elevation_m": 1390,
+      "capacity_specs": "120m Footbridge connecting Kiul to Nakote",
+      "recommended_action": "Post local ward police to prevent crossing."
+    },
+    {
+      "infra_id": "settlement-melamchi-bazaar",
+      "name": "Melamchi Bazaar Commercial Hub",
+      "type": "Urban Settlement",
+      "zone_id": "melamchi-basin",
+      "zone_name": "Melamchi River Basin",
+      "status": "EMERGENCY_LOCKDOWN",
+      "risk_score": 82,
+      "criticality": "CRITICAL",
+      "coordinates": {
+        "lat": 27.829,
+        "lon": 85.58
+      },
+      "elevation_m": 845,
+      "population_at_risk": 4200,
+      "recommended_action": "Immediate evacuation via Upper Ward route."
+    },
+    {
+      "infra_id": "hydro-upper-bhotekoshi-45mw",
+      "name": "Upper Bhotekoshi Hydropower Station (45MW)",
+      "type": "Hydropower Plant",
+      "zone_id": "bhotekoshi-basin",
+      "zone_name": "Bhotekoshi River Basin",
+      "status": "WARNING_ALERT",
+      "risk_score": 58,
+      "criticality": "HIGH",
+      "coordinates": {
+        "lat": 27.94,
+        "lon": 85.89
+      },
+      "elevation_m": 1350,
+      "capacity_specs": "45 Megawatts Run-of-River (Bhotekoshi Power Company)",
+      "recommended_action": "Place powerhouse operators on standby for intake closure."
+    },
+    {
+      "infra_id": "hydro-middle-bhotekoshi-102mw",
+      "name": "Middle Bhotekoshi Hydro (102MW)",
+      "type": "Hydropower Plant",
+      "zone_id": "bhotekoshi-basin",
+      "zone_name": "Bhotekoshi River Basin",
+      "status": "NORMAL",
+      "risk_score": 42,
+      "criticality": "HIGH",
+      "coordinates": {
+        "lat": 27.88,
+        "lon": 85.86
+      },
+      "elevation_m": 1150,
+      "capacity_specs": "102 Megawatts Under Chilime/NEA",
+      "recommended_action": "Standard monitoring."
+    },
+    {
+      "infra_id": "bridge-arniko-miteri",
+      "name": "Arniko Highway Miteri Bridge",
+      "type": "International Transit Bridge",
+      "zone_id": "bhotekoshi-basin",
+      "zone_name": "Bhotekoshi River Basin",
+      "status": "NORMAL",
+      "risk_score": 38,
+      "criticality": "HIGH",
+      "coordinates": {
+        "lat": 27.9715,
+        "lon": 85.9625
+      },
+      "elevation_m": 1580,
+      "capacity_specs": "Nepal-China Border Transit Link",
+      "recommended_action": "Routine border transit checks."
+    }
+  ],
+  "risk_events": [
+    {
+      "zone_id": "melamchi-basin",
+      "timestamp": "2026-09-17T04:30:36.471931+00:00",
+      "event_id": "evt-melamchi-live-001",
+      "zone_name": "Melamchi River Basin",
+      "risk_score": 82,
+      "risk_level": "CRITICAL",
+      "model_features": {
+        "rainfall_24h": 142.0,
+        "slope": 37.2,
+        "lake_change": 0.21,
+        "displacement": 0.14
+      },
+      "inference_engine": "sagemaker:terrasentinel-risk-model",
+      "impacted_infrastructure_count": 3,
+      "alert_id": "alt-melamchi-001"
+    },
+    {
+      "zone_id": "bhotekoshi-basin",
+      "timestamp": "2026-09-17T04:30:36.471931+00:00",
+      "event_id": "evt-bhotekoshi-live-002",
+      "zone_name": "Bhotekoshi River Basin",
+      "risk_score": 58,
+      "risk_level": "MODERATE",
+      "model_features": {
+        "rainfall_24h": 68.5,
+        "slope": 39.5,
+        "lake_change": 0.12,
+        "displacement": 0.06
+      },
+      "inference_engine": "sagemaker:terrasentinel-risk-model",
+      "impacted_infrastructure_count": 1,
+      "alert_id": "alt-bhotekoshi-002"
+    }
+  ],
+  "alerts": [
+    {
+      "alert_id": "alt-melamchi-001",
+      "event_id": "evt-melamchi-live-001",
+      "zone_id": "melamchi-basin",
+      "zone_name": "Melamchi River Basin",
+      "timestamp": "2026-09-17T04:30:36.471931+00:00",
+      "risk_level": "CRITICAL",
+      "risk_score": 82,
+      "message_en": "URGENT EVACUATION: Critical flood and debris surge (82/100) detected in Melamchi Basin! Immediate riverbank evacuation ordered. Move to Melamchi Upper Community Hilltop Ridge (1280m) immediately.",
+      "message_ne": "अति जरुरी सूचना: मेलम्ची क्षेत्रमा उच्च बाढी र पहिरोको गम्भीर जोखिम (82/100) पत्ता लागेको छ। तुरुन्तै नदी किनार छाडेर सुरक्षित उच्च स्थान मेलम्ची डाँडातर्फ जानुहोस्।",
+      "polly_voice_config": {
+        "voice_id": "Aditi",
+        "language_code": "hi-IN",
+        "text": "अति जरुरी सूचना: मेलम्ची क्षेत्रमा उच्च बाढी र पहिरोको गम्भीर जोखिम पत्ता लागेको छ। तुरुन्तै सुरक्षित उच्च स्थानमा जानुहोस्।"
+      },
+      "delivery_status": "SENT",
+      "channels": [
+        "SMS",
+        "POLICE_RADIO",
+        "POLLY_VOICE",
+        "SIRENS"
+      ]
+    }
+  ],
+  "rescue_cases": [
+    {
+      "case_id": "rec-melamchi-001",
+      "zone_id": "melamchi-basin",
+      "priority": "P1_URGENT",
+      "status": "DEPLOYED",
+      "target_location": "Melamchi Bazaar Confluence",
+      "coordinates": {
+        "lat": 27.829,
+        "lon": 85.58
+      },
+      "evacuation_safe_zone": "Melamchi Upper Community Hilltop Ridge (1280m)",
+      "designated_route": "Ascend 40 vertical meters above the Melamchi riverbed.",
+      "estimated_people_impacted": 4200,
+      "timestamp": "2026-09-17T04:30:36.471931+00:00"
+    }
+  ]
+}

@@ -1,0 +1,337 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  TerraSentinel-Nepal
+  Serverless Backend & Geospatial Cloud Pipeline for Cascading Flood & GLOF Early Warning (Member 3 — Manas)
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 256
+    Runtime: python3.10
+    Tracing: Active
+    Environment:
+      Variables:
+        DYNAMODB_RISK_EVENTS: !Ref RiskEventsTable
+        DYNAMODB_INFRASTRUCTURE: !Ref InfrastructureTable
+        DYNAMODB_ALERTS: !Ref AlertsTable
+        DYNAMODB_RESCUE_CASES: !Ref RescueCasesTable
+        S3_DATA_BUCKET: !Ref TerraSentinelDataBucket
+        SAGEMAKER_ENDPOINT_NAME: !Ref SageMakerEndpointName
+        AWS_DEFAULT_REGION_NAME: !Ref "AWS::Region"
+
+Parameters:
+  SageMakerEndpointName:
+    Type: String
+    Default: "terrasentinel-risk-model"
+    Description: "Name of the deployed Amazon SageMaker inference endpoint (fallback heuristic is used if endpoint is inactive)"
+  StageName:
+    Type: String
+    Default: "prod"
+    Description: "API Gateway deployment stage"
+
+Resources:
+  ##############################################################################
+  # S3 Storage
+  ##############################################################################
+  TerraSentinelDataBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "terrasentinel-geodata-${AWS::AccountId}-${AWS::Region}"
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      VersioningConfiguration:
+        Status: Enabled
+      NotificationConfiguration:
+        EventBridgeConfiguration:
+          EventBridgeEnabled: true
+
+  ##############################################################################
+  # DynamoDB Tables (On-Demand / Pay-per-request for zero idle cost)
+  ##############################################################################
+  RiskEventsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: "TerraSentinel-RiskEvents"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: zone_id
+          AttributeType: S
+        - AttributeName: timestamp
+          AttributeType: S
+        - AttributeName: event_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: zone_id
+          KeyType: HASH
+        - AttributeName: timestamp
+          KeyType: RANGE
+      GlobalSecondaryIndexes:
+        - IndexName: EventIndex
+          KeySchema:
+            - AttributeName: event_id
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+
+  InfrastructureTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: "TerraSentinel-Infrastructure"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: infra_id
+          AttributeType: S
+        - AttributeName: zone_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: infra_id
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: ZoneIndex
+          KeySchema:
+            - AttributeName: zone_id
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+
+  AlertsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: "TerraSentinel-Alerts"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: alert_id
+          AttributeType: S
+        - AttributeName: timestamp
+          AttributeType: S
+      KeySchema:
+        - AttributeName: alert_id
+          KeyType: HASH
+        - AttributeName: timestamp
+          KeyType: RANGE
+
+  RescueCasesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: "TerraSentinel-RescueCases"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: case_id
+          AttributeType: S
+        - AttributeName: priority
+          AttributeType: S
+      KeySchema:
+        - AttributeName: case_id
+          KeyType: HASH
+        - AttributeName: priority
+          KeyType: RANGE
+
+  ##############################################################################
+  # Lambda Functions (Pipeline Microservices)
+  ##############################################################################
+  ProcessDataFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: "terrasentinel-process-data"
+      CodeUri: functions/process_data/
+      Handler: app.lambda_handler
+      Description: "Validates and normalizes raw satellite, weather, and sensor data from S3"
+      Policies:
+        - S3CrudPolicy:
+            BucketName: !Sub "terrasentinel-geodata-${AWS::AccountId}-${AWS::Region}"
+        - DynamoDBCrudPolicy:
+            TableName: !Ref RiskEventsTable
+
+  CalculateFeaturesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: "terrasentinel-calculate-features"
+      CodeUri: functions/calculate_features/
+      Handler: app.lambda_handler
+      Description: "Extracts slope, 24h rainfall, NDWI water body delta, and SAR ground displacement"
+      Policies:
+        - S3CrudPolicy:
+            BucketName: !Sub "terrasentinel-geodata-${AWS::AccountId}-${AWS::Region}"
+
+  RunRiskModelFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: "terrasentinel-run-risk-model"
+      CodeUri: functions/run_risk_model/
+      Handler: app.lambda_handler
+      Description: "Executes ML inference via Amazon SageMaker endpoint with internal fallback heuristic"
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - sagemaker:InvokeEndpoint
+              Resource: !Sub "arn:aws:sagemaker:${AWS::Region}:${AWS::AccountId}:endpoint/*"
+
+  GenerateAlertFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: "terrasentinel-generate-alert"
+      CodeUri: functions/generate_alert/
+      Handler: app.lambda_handler
+      Description: "Evaluates risk against danger thresholds, identifies downstream infrastructure, generates Polly text and updates DynamoDB"
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref RiskEventsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref InfrastructureTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AlertsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref RescueCasesTable
+        - Statement:
+            - Effect: Allow
+              Action:
+                - polly:SynthesizeSpeech
+                - sns:Publish
+              Resource: "*"
+
+  ApiHandlerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: "terrasentinel-api-handler"
+      CodeUri: functions/api_handler/
+      Handler: app.lambda_handler
+      Description: "Serves REST API routes and triggers interactive flood simulations"
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref RiskEventsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref InfrastructureTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AlertsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref RescueCasesTable
+        - Statement:
+            - Effect: Allow
+              Action:
+                - states:StartExecution
+                - states:DescribeExecution
+              Resource: !Ref RiskPipelineStateMachine
+      Events:
+        ApiRoot:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref TerraSentinelHttpApi
+            Path: /{proxy+}
+            Method: ANY
+
+  ##############################################################################
+  # HTTP API Gateway (v2 - High Performance & Low Latency)
+  ##############################################################################
+  TerraSentinelHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: !Ref StageName
+      CorsConfiguration:
+        AllowMethods:
+          - GET
+          - POST
+          - OPTIONS
+        AllowHeaders:
+          - Content-Type
+          - Authorization
+          - X-Amz-Date
+          - X-Api-Key
+          - X-Amz-Security-Token
+        AllowOrigins:
+          - "*"
+
+  ##############################################################################
+  # Step Functions State Machine
+  ##############################################################################
+  RiskPipelineStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: "TerraSentinel-RiskPipeline"
+      DefinitionUri: statemachine/risk_pipeline.asl.json
+      DefinitionSubstitutions:
+        ProcessDataArn: !GetAtt ProcessDataFunction.Arn
+        CalculateFeaturesArn: !GetAtt CalculateFeaturesFunction.Arn
+        RunRiskModelArn: !GetAtt RunRiskModelFunction.Arn
+        GenerateAlertArn: !GetAtt GenerateAlertFunction.Arn
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: !Ref ProcessDataFunction
+        - LambdaInvokePolicy:
+            FunctionName: !Ref CalculateFeaturesFunction
+        - LambdaInvokePolicy:
+            FunctionName: !Ref RunRiskModelFunction
+        - LambdaInvokePolicy:
+            FunctionName: !Ref GenerateAlertFunction
+
+  ##############################################################################
+  # EventBridge Rule: Trigger Step Functions on S3 Raw Data Upload
+  ##############################################################################
+  S3DataUploadRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: "TerraSentinel-S3UploadTrigger"
+      Description: "Triggers Step Functions pipeline when new geospatial files are uploaded to raw-data/"
+      EventPattern:
+        source:
+          - "aws.s3"
+        detail-type:
+          - "Object Created"
+        detail:
+          bucket:
+            name:
+              - !Sub "terrasentinel-geodata-${AWS::AccountId}-${AWS::Region}"
+          object:
+            key:
+              - prefix: "raw-data/"
+      State: "ENABLED"
+      Targets:
+        - Arn: !Ref RiskPipelineStateMachine
+          Id: "TriggerTerraSentinelStateMachine"
+          RoleArn: !GetAtt EventBridgeStepFunctionsRole.Arn
+
+  EventBridgeStepFunctionsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: ExecuteStepFunction
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - states:StartExecution
+                Resource: !Ref RiskPipelineStateMachine
+
+Outputs:
+  HttpApiUrl:
+    Description: "Base URL for TerraSentinel-Nepal REST API Gateway"
+    Value: !Sub "https://${TerraSentinelHttpApi}.execute-api.${AWS::Region}.amazonaws.com/${StageName}"
+  StepFunctionsArn:
+    Description: "ARN of the Risk Pipeline Step Functions State Machine"
+    Value: !Ref RiskPipelineStateMachine
+  S3BucketName:
+    Description: "S3 Bucket for raw, processed, results, model, and alerts data"
+    Value: !Ref TerraSentinelDataBucket
+  RiskEventsTableName:
+    Description: "DynamoDB RiskEvents Table Name"
+    Value: !Ref RiskEventsTable
+  InfrastructureTableName:
+    Description: "DynamoDB Infrastructure Table Name"
+    Value: !Ref InfrastructureTable
+  AlertsTableName:
+    Description: "DynamoDB Alerts Table Name"
+    Value: !Ref AlertsTable
+  RescueCasesTableName:
+    Description: "DynamoDB RescueCases Table Name"
+    Value: !Ref RescueCasesTable
