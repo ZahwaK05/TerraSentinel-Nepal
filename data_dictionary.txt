@@ -1,0 +1,60 @@
+TerraSentinel-Nepal — Data Dictionary
+======================================
+Every column in melamchi_features.csv / melamchi_features.parquet.
+Columns marked [PENDING] are populated once the corresponding phase runs.
+Columns are NEVER filled with fabricated values — if a feature could not be
+reliably produced, it is removed from the table and the reason is logged in
+metadata.csv rather than left in here as a placeholder.
+
+IDENTIFIERS
+-----------
+cell_id                        Unique ID of the 100m x 100m grid cell (grid/build_grid.py)
+event_id                       One of MELAMCHI_2021, MELAMCHI_2026, RASUWA_2026 — never mixed
+date                           Date associated with this row's observation (event-specific)
+latitude, longitude            Centroid of the grid cell, WGS84 (EPSG:4326), decimal degrees
+
+RAINFALL (NASA GPM IMERG) [PENDING]
+------------------------------------
+rainfall_1h ... rainfall_7day  Cumulative rainfall (mm) over the stated window ending at `date`,
+                                from IMERG at native ~0.1 deg (~10km) resolution, resampled to the
+                                grid — see metadata.csv for exact original resolution, do not assume
+                                the grid resolution equals IMERG's native resolution.
+
+TERRAIN (NASADEM/SRTM ~30m) [PENDING]
+----------------------------------------
+elevation                      Meters above sea level
+slope                          Degrees
+aspect                         Degrees from north (0-360), slope-facing direction
+curvature                      Profile curvature (unitless, DEM-derivative)
+flow_accumulation              Upslope contributing cells (unitless, D8 accumulation count)
+distance_to_river               Meters to nearest mapped river channel
+river_gradient                 Local channel slope (m/m) at nearest river reach
+
+SENTINEL-2 / WATER [PENDING]
+-------------------------------
+ndwi_mean                      Mean NDWI = (Green[B03] - NIR[B08]) / (Green[B03] + NIR[B08]) for the cell, unitless [-1,1]
+ndwi_change                    Post-event ndwi_mean minus pre-event ndwi_mean
+water_area                     Water-classified area within the cell, m^2 (NDWI threshold-based mask)
+water_area_change_pct          % change in water_area, pre- vs post-event
+
+SENTINEL-1 SAR [PENDING]
+---------------------------
+sar_change                     Log-ratio (dB) change in backscatter, post vs pre event (VV, or VV+VH combined — documented per-run in metadata.csv)
+displacement                   [May be dropped — see metadata.csv] InSAR-derived displacement, cm, if reliably obtainable
+displacement_change             [May be dropped] Change in displacement between periods, cm
+
+HISTORICAL HAZARDS [PENDING]
+--------------------------------
+historical_landslide_density   Landslide polygons per km^2 within a fixed radius of the cell centroid
+distance_to_historical_landslide  Meters to nearest mapped historical landslide
+distance_to_landslide_dam      Meters to nearest known landslide-dam location
+
+GLACIAL LAKES (ICIMOD) [PENDING]
+------------------------------------
+distance_to_glacial_lake       Meters to nearest inventoried glacial lake
+glacial_lake_area              Area (m^2) of that nearest lake
+glacial_lake_area_change       % or absolute change in that lake's area, if historical imagery allows
+
+TARGET
+------
+landslide_label                 0 = no known landslide, 1 = landslide, from historical hazard layer

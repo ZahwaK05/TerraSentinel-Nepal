@@ -1,0 +1,15 @@
+.env
+__pycache__/
+data/raw/
+
+.env
+venv/
+.venv/
+__pycache__/
+*.pyc
+data/raw/
+data_new/
+metadata.bak
+*DO_NOT_USE*
+.ipynb_checkpoints/
+.vscode/

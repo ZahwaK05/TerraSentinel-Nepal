@@ -1,0 +1,7 @@
+Brief columns NOT in melamchi_features.parquet (region=melamchi):
+- displacement
+- displacement_change
+- distance_to_historical_landslide
+- distance_to_landslide_dam
+
+Missing source tables: (none)

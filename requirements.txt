@@ -1,0 +1,17 @@
+geopandas>=0.14
+rasterio>=1.3
+shapely>=2.0
+pyproj>=3.6
+numpy>=1.26
+pandas>=2.2
+pyarrow>=15.0            # parquet support
+pystac-client>=0.8       # STAC search against Copernicus Data Space
+planetary-computer>=1.0  # optional fallback STAC catalog (Microsoft Planetary Computer mirrors S1/S2/DEM)
+odc-stac>=0.3            # load STAC items straight into xarray
+xarray>=2024.2
+rioxarray>=0.15
+earthaccess>=0.9         # NASA Earthdata (GPM IMERG, NASADEM) auth + search + download
+h5py>=3.10                # reading IMERG HDF5/NetCDF granules
+netCDF4>=1.6
+python-dotenv>=1.0
+tqdm>=4.66
