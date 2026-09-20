@@ -333,7 +333,7 @@ The TerraSentinel dashboard provides a centralized view of basin-level risk, aff
 The basin-wide risk grid provides spatial visualization across more than **32,000 grid cells**, allowing users to inspect the geographic distribution of risk across the Melamchi watershed.
 
 <p align="center">
-  <img src="docs/screenshots/basin-risk-grid.png" width="95%">
+  <img src="docs/screenshots/basin-risk-grid.jpeg" width="95%">
 </p>
 
 The interface supports scenario comparison between **2021** and **2026**.
@@ -345,7 +345,7 @@ The interface supports scenario comparison between **2021** and **2026**.
 The rescue module converts post-event sensing information into prioritized response cases.
 
 <p align="center">
-  <img src="docs/screenshots/rescue-priority.png" width="95%">
+  <img src="docs/screenshots/rescue-priority.jpeg" width="95%">
 </p>
 
 The rescue interface displays:
