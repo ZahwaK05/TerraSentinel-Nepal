@@ -315,6 +315,49 @@ The frontend can also use local/static risk-grid data during development before 
 
 ---
 
+
+## 🖥️ Dashboard Preview
+
+### 🌍 Command-Center Risk Dashboard
+
+The TerraSentinel dashboard provides a centralized view of basin-level risk, affected zones, population exposure, and critical infrastructure.
+
+<p align="center">
+  <img src="docs/screenshots/dashboard-risk-overlay.png" width="95%">
+</p>
+
+---
+
+### 🗺️ Basin-Wide Risk Grid
+
+The basin-wide risk grid provides spatial visualization across more than **32,000 grid cells**, allowing users to inspect the geographic distribution of risk across the Melamchi watershed.
+
+<p align="center">
+  <img src="docs/screenshots/basin-risk-grid.png" width="95%">
+</p>
+
+The interface supports scenario comparison between **2021** and **2026**.
+
+---
+
+### 🚑 Post-Disaster Rescue Priority
+
+The rescue module converts post-event sensing information into prioritized response cases.
+
+<p align="center">
+  <img src="docs/screenshots/rescue-priority.png" width="95%">
+</p>
+
+The rescue interface displays:
+
+- 🔥 Thermal signal
+- 🔊 Acoustic signal
+- 📡 RF signal
+- 🌊 Estimated debris depth
+- 🚨 Rescue priority
+- 📍 Target location
+- 🚑 Rescue-team deployment
+
 # ☁️ AWS Architecture
 
 TerraSentinel is designed around an event-driven, serverless AWS architecture.
