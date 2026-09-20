@@ -1,4 +1,4 @@
-# 🌍 TerraSentinel-Nepal
+#  TerraSentinel-Nepal
 
 <p align="center">
   <strong>AI-Powered Geospatial Disaster Intelligence & Decision Support for the Himalayas</strong>
@@ -10,26 +10,26 @@
 
 ---
 
-## 🚨 Overview
+##  Overview
 
 **TerraSentinel-Nepal** is a geospatial disaster-intelligence platform designed to help emergency-response and disaster-management teams understand environmental risk, identify areas requiring attention, and support faster decision-making in hazard-prone Himalayan regions.
 
 The platform brings together:
 
-- 🛰️ Satellite observations
-- 🌧️ Rainfall and environmental data
-- 🏔️ Terrain and hydrological features
-- 🧊 Glacial-lake proximity information
-- 🤖 AI/ML and geospatial processing
-- ☁️ AWS cloud infrastructure
-- 🗺️ Spatial risk visualization
-- 🚑 Emergency-response and rescue workflows
+-  Satellite observations
+-  Rainfall and environmental data
+-  Terrain and hydrological features
+-  Glacial-lake proximity information
+-  AI/ML and geospatial processing
+-  AWS cloud infrastructure
+-  Spatial risk visualization
+-  Emergency-response and rescue workflows
 
 The current implementation focuses on the **Melamchi watershed in Nepal** and demonstrates a V1 spatial risk engine alongside a web-based decision-support dashboard and cloud-oriented backend architecture.
 
 ---
 
-# 🎯 The Problem
+#  The Problem
 
 Himalayan communities face interconnected hazards such as:
 
@@ -56,7 +56,7 @@ TerraSentinel addresses this challenge by creating a unified geospatial decision
 
 ---
 
-# 💡 Our Solution
+#  Our Solution
 
 TerraSentinel follows a simple operational concept:
 
@@ -70,25 +70,25 @@ TerraSentinel follows a simple operational concept:
          RESCUE
 ```
 
-### 🔮 Predict
+###  Predict
 
 Analyze rainfall, terrain and environmental conditions to identify areas with elevated spatial risk.
 
-### 🛡️ Protect
+###  Protect
 
 Present risk information alongside geographic and infrastructure context to support preparedness and prioritization.
 
-### 📍 Locate
+###  Locate
 
 Use post-event geospatial and satellite information to identify areas requiring assessment.
 
-### 🚑 Rescue
+###  Rescue
 
 Combine risk, damage and field information to support prioritization of emergency response and search activities.
 
 ---
 
-# 🗺️ Current Demonstration: Melamchi, Nepal
+#  Current Demonstration: Melamchi, Nepal
 
 The current geospatial risk implementation focuses on the **Melamchi watershed** and supports two event/scenario datasets:
 
@@ -110,7 +110,7 @@ The same spatial grid is used for both scenarios, enabling cell-by-cell comparis
 
 ---
 
-# 🤖 V1 Spatial Risk Engine
+#  V1 Spatial Risk Engine
 
 The current V1 engine produces a **0–100 spatial risk-prioritization score** for every grid cell.
 
@@ -119,13 +119,13 @@ The current V1 engine produces a **0–100 spatial risk-prioritization score** f
 The V1 baseline combines three interpretable components:
 
 ```text
-                 🌧️ Rainfall
+                  Rainfall
                      │
                      ▼
               Rainfall Score
                      │
                      │
-🏔️ Terrain ──────────┼────────── 🧊 Lake Proximity
+ Terrain ──────────┼──────────  Lake Proximity
                      │
                      ▼
               ┌─────────────┐
@@ -147,7 +147,7 @@ This approach was chosen to keep the V1 system **transparent, reproducible and i
 
 ---
 
-## 🌧️ Rainfall Intelligence
+##  Rainfall Intelligence
 
 The rainfall pipeline examines multiple accumulation windows:
 
@@ -170,7 +170,7 @@ Therefore, the rainfall component should be interpreted as a **regional rainfall
 
 ---
 
-## 🏔️ Terrain Intelligence
+##  Terrain Intelligence
 
 Terrain susceptibility is represented using spatial features including:
 
@@ -201,7 +201,7 @@ This prevents directions near 0° and 360° from being treated as far apart.
 
 ---
 
-## 🧊 Glacial-Lake Intelligence
+##  Glacial-Lake Intelligence
 
 The V1 risk engine incorporates **distance to the nearest inventoried glacial lake**.
 
@@ -211,7 +211,7 @@ Glacial-lake area and related information remain available as environmental cont
 
 ---
 
-# 🛰️ Satellite & Environmental Data
+#  Satellite & Environmental Data
 
 The broader TerraSentinel pipeline incorporates:
 
@@ -230,7 +230,7 @@ Post-event satellite variables such as SAR/NDWI change are kept conceptually sep
 
 ---
 
-# 📚 Historical Landslide Data & ML Strategy
+#  Historical Landslide Data & ML Strategy
 
 Historical landslide information is incorporated as a reference and analytical layer.
 
@@ -254,7 +254,7 @@ A future ML model should use:
 
 ---
 
-# 📊 Risk Outputs
+#  Risk Outputs
 
 The current V1 pipeline generates four primary spatial outputs:
 
@@ -285,20 +285,20 @@ GeoPackage outputs are provided for GIS and spatial-visualization workflows.
 
 ---
 
-# 🖥️ Decision-Support Dashboard
+#  Decision-Support Dashboard
 
 The repository also contains a **Next.js / React / TypeScript** frontend designed as a disaster decision-support interface.
 
 The dashboard includes concepts for:
 
-- 🗺️ Risk-zone visualization
-- 📊 Risk-level classification
-- 📈 Risk trends
-- 🏗️ Infrastructure information
-- 🚨 Alerts
-- 🚑 Rescue information
-- 🧪 Event simulation
-- 📍 Per-cell risk-grid visualization
+-  Risk-zone visualization
+-  Risk-level classification
+-  Risk trends
+-  Infrastructure information
+-  Alerts
+-  Rescue information
+-  Event simulation
+-  Per-cell risk-grid visualization
 
 The frontend API layer supports integration with backend endpoints such as:
 
@@ -316,9 +316,9 @@ The frontend can also use local/static risk-grid data during development before 
 ---
 
 
-## 🖥️ Dashboard Preview
+##  Dashboard Preview
 
-### 🌍 Command-Center Risk Dashboard
+###  Command-Center Risk Dashboard
 
 The TerraSentinel dashboard provides a centralized view of basin-level risk, affected zones, population exposure, and critical infrastructure.
 
@@ -328,7 +328,7 @@ The TerraSentinel dashboard provides a centralized view of basin-level risk, aff
 
 ---
 
-### 🗺️ Basin-Wide Risk Grid
+###  Basin-Wide Risk Grid
 
 The basin-wide risk grid provides spatial visualization across more than **32,000 grid cells**, allowing users to inspect the geographic distribution of risk across the Melamchi watershed.
 
@@ -340,7 +340,7 @@ The interface supports scenario comparison between **2021** and **2026**.
 
 ---
 
-### 🚑 Post-Disaster Rescue Priority
+###  Post-Disaster Rescue Priority
 
 The rescue module converts post-event sensing information into prioritized response cases.
 
@@ -350,15 +350,15 @@ The rescue module converts post-event sensing information into prioritized respo
 
 The rescue interface displays:
 
-- 🔥 Thermal signal
-- 🔊 Acoustic signal
-- 📡 RF signal
-- 🌊 Estimated debris depth
-- 🚨 Rescue priority
-- 📍 Target location
-- 🚑 Rescue-team deployment
+-  Thermal signal
+-  Acoustic signal
+-  RF signal
+-  Estimated debris depth
+-  Rescue priority
+-  Target location
+-  Rescue-team deployment
 
-# ☁️ AWS Architecture
+#  AWS Architecture
 
 TerraSentinel is designed around an event-driven, serverless AWS architecture.
 
@@ -412,7 +412,7 @@ The backend also provides local simulation and development workflows so the appl
 
 ---
 
-# 🧰 Technology Stack
+#  Technology Stack
 
 ### AI / ML
 
@@ -457,7 +457,7 @@ The backend also provides local simulation and development workflows so the appl
 
 ---
 
-# 🏗️ Repository Structure
+#  Repository Structure
 
 ```text
 TerraSentinel-Nepal/
@@ -485,11 +485,12 @@ TerraSentinel-Nepal/
 │   └── lib/
 │
 └── docs/
+|  ├── screenshots/
 ```
 
 ---
 
-# 🔬 Reproducible ML / Geospatial Workflow
+#  Reproducible ML / Geospatial Workflow
 
 The current workflow follows:
 
@@ -532,7 +533,7 @@ The resulting outputs can be inspected independently of the application layer.
 
 ---
 
-# ⚠️ Current Limitations
+#  Current Limitations
 
 TerraSentinel V1 is intentionally presented with clear limitations.
 
@@ -558,7 +559,7 @@ The repository contains the cloud-oriented backend architecture and integration 
 
 ---
 
-# 🚀 Roadmap
+#  Roadmap
 
 ## V2 — Data-Driven ML Risk Prediction
 
@@ -592,7 +593,7 @@ Extend the framework to additional Himalayan watersheds when suitable regional d
 
 ---
 
-# 👥 Team
+#  Team
 
 | Team Member | Contribution |
 |---|---|
@@ -603,25 +604,25 @@ Extend the framework to additional Himalayan watersheds when suitable regional d
 
 ---
 
-# 🏆 Hackathon Demonstration
+#  Hackathon Demonstration
 
 The current demonstration brings together three major layers:
 
-### 1. 🧠 Intelligence
+### 1.  Intelligence
 
 A reproducible geospatial V1 risk engine operating across **32,435 grid cells** for the Melamchi study area.
 
-### 2. ☁️ Infrastructure
+### 2.  Infrastructure
 
 A cloud-oriented AWS backend architecture for processing, storing and serving risk and emergency information.
 
-### 3. 🖥️ Experience
+### 3.  Experience
 
 A command-center-style web interface designed to turn complex spatial information into information that emergency teams can understand and act upon.
 
 ---
 
-# 🌍 Impact
+#  Impact
 
 TerraSentinel aims to shorten the path from **raw environmental data to an actionable emergency decision**.
 
@@ -651,8 +652,8 @@ The platform is designed to help disaster-management teams answer practical ques
 
 ---
 
-# 🔭 Vision
+#  Vision
 
 > **Turn fragmented geospatial data into actionable disaster intelligence for safer Himalayan communities.**
 
-## Predict → Protect → Locate → Rescue 🚨
+## Predict → Protect → Locate → Rescue 
